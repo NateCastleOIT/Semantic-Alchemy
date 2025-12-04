@@ -34,7 +34,7 @@ Respond with ONLY a valid JSON object in this exact format:
   "name": "The Element Name",
   "description": "A 2-3 sentence poetic but coherent description of what this element is and what it represents",
   "tags": ["tag1", "tag2", "tag3", "tag4"],
-  "visual_hint": "Brief description of appearance or manifestation",
+  "visual_hint": "A single emoji that best represents this element",
   "behavior_hints": ["hint1", "hint2", "hint3"]
 }}
 
@@ -42,6 +42,7 @@ Guidelines:
 - The name should feel magical but make semantic sense
 - Description should explain WHY this combination makes sense
 - Tags should be single words or short phrases describing properties
+- Visual hint must be a single emoji character (like 🔥, 💧, ⚡, etc.)
 - Behavior hints describe what this element DOES (spreads, erupts, flows, crystallizes, etc)
 - Make it feel inevitable, not random
 - Consider the ORDER: base element modified by the second element
