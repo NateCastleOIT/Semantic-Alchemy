@@ -110,23 +110,23 @@ async def combine_elements(request: CombineRequest):
     if not elem1 or not elem2:
         raise HTTPException(status_code=404, detail="One or both elements not found")
 
-    # Try to combine
-    result = engine.combine(elem1.name, elem2.name)
+    # Try to combine - pass Element objects, not names
+    result = engine.combine(elem1, elem2)
 
     if result:
-        was_discovered = result.get("was_discovered", False)
-        new_element = database.get_element_by_name(result["result"])
+        # Check if this was a new discovery
+        was_discovered = not database.get_combination(f"{elem1.id}+{elem2.id}")
 
         return CombineResponse(
             success=True,
             result=ElementResponse(
-                id=new_element.id,
-                name=new_element.name,
-                emoji=new_element.visual_hint,
-                definition=new_element.description,
-                is_base=new_element.is_base
+                id=result.id,
+                name=result.name,
+                emoji=result.visual_hint,
+                definition=result.description,
+                is_base=result.is_base
             ),
-            message=f"Created: {result['result']}",
+            message=f"Created: {result.name}",
             was_discovered=was_discovered
         )
     else:

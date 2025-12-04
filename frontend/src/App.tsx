@@ -188,9 +188,12 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Result Area */}
-          {result && (
+        {/* Result Panel - Persistent on the right */}
+        <div className="result-panel">
+          <h2>Last Result</h2>
+          {result ? (
             <div className={`result-area ${result.success ? 'success' : 'failure'}`}>
               {result.success ? (
                 <>
@@ -203,10 +206,14 @@ function App() {
                 </>
               ) : (
                 <>
-                  <div style={{ fontSize: '3em', marginBottom: '10px' }}></div>
+                  <div style={{ fontSize: '3em', marginBottom: '10px' }}>❌</div>
                   <div>{result.message}</div>
                 </>
               )}
+            </div>
+          ) : (
+            <div className="result-placeholder">
+              Combine elements to see results here
             </div>
           )}
         </div>
