@@ -39,15 +39,15 @@ initialize_base_elements(database)
 
 # Pydantic models for request/response
 class CombineRequest(BaseModel):
-    element1_id: int
-    element2_id: int
+    element1_id: str  # UUID string
+    element2_id: str  # UUID string
 
 
 class ElementResponse(BaseModel):
-    id: int
+    id: str  # UUID string
     name: str
-    emoji: str
-    definition: str
+    emoji: str  # Maps to visual_hint
+    definition: str  # Maps to description
     is_base: bool
 
 
@@ -76,8 +76,8 @@ async def get_all_elements():
         ElementResponse(
             id=elem.id,
             name=elem.name,
-            emoji=elem.emoji,
-            definition=elem.definition,
+            emoji=elem.visual_hint,
+            definition=elem.description,
             is_base=elem.is_base
         )
         for elem in elements
@@ -85,17 +85,17 @@ async def get_all_elements():
 
 
 @app.get("/elements/{element_id}", response_model=ElementResponse)
-async def get_element(element_id: int):
+async def get_element(element_id: str):
     """Get a specific element by ID."""
-    element = database.get_element_by_id(element_id)
+    element = database.get_element(element_id)
     if not element:
         raise HTTPException(status_code=404, detail="Element not found")
 
     return ElementResponse(
         id=element.id,
         name=element.name,
-        emoji=element.emoji,
-        definition=element.definition,
+        emoji=element.visual_hint,
+        definition=element.description,
         is_base=element.is_base
     )
 
@@ -104,8 +104,8 @@ async def get_element(element_id: int):
 async def combine_elements(request: CombineRequest):
     """Combine two elements to create a new one."""
     # Get elements
-    elem1 = database.get_element_by_id(request.element1_id)
-    elem2 = database.get_element_by_id(request.element2_id)
+    elem1 = database.get_element(request.element1_id)
+    elem2 = database.get_element(request.element2_id)
 
     if not elem1 or not elem2:
         raise HTTPException(status_code=404, detail="One or both elements not found")
@@ -122,8 +122,8 @@ async def combine_elements(request: CombineRequest):
             result=ElementResponse(
                 id=new_element.id,
                 name=new_element.name,
-                emoji=new_element.emoji,
-                definition=new_element.definition,
+                emoji=new_element.visual_hint,
+                definition=new_element.description,
                 is_base=new_element.is_base
             ),
             message=f"Created: {result['result']}",
@@ -152,7 +152,7 @@ async def get_stats():
 
 if __name__ == "__main__":
     import uvicorn
-    print("🧪 Starting Semantic Alchemy API...")
-    print("📚 API Documentation: http://localhost:8000/docs")
-    print("🔄 Hot reload enabled - changes will auto-update")
+    print("Starting Semantic Alchemy API...")
+    print("API Documentation: http://localhost:8000/docs")
+    print("Hot reload enabled - changes will auto-update")
     uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
