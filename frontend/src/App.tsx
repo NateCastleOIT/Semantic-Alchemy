@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import { api } from './api';
+import type { Element, Stats, CombineResponse } from './types';
 
 function App() {
-  const [elements, setElements] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [slot1, setSlot1] = useState(null);
-  const [slot2, setSlot2] = useState(null);
-  const [result, setResult] = useState(null);
+  const [elements, setElements] = useState<Element[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [slot1, setSlot1] = useState<Element | null>(null);
+  const [slot2, setSlot2] = useState<Element | null>(null);
+  const [result, setResult] = useState<CombineResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Load elements and stats on mount
   useEffect(() => {
@@ -34,7 +35,7 @@ function App() {
     }
   };
 
-  const handleElementClick = (element) => {
+  const handleElementClick = (element: Element) => {
     if (!slot1) {
       setSlot1(element);
     } else if (!slot2) {
@@ -193,9 +194,9 @@ function App() {
             <div className={`result-area ${result.success ? 'success' : 'failure'}`}>
               {result.success ? (
                 <>
-                  <div className="result-emoji">{result.result.emoji}</div>
-                  <div className="result-name">{result.result.name}</div>
-                  <div className="result-definition">{result.result.definition}</div>
+                  <div className="result-emoji">{result.result?.emoji}</div>
+                  <div className="result-name">{result.result?.name}</div>
+                  <div className="result-definition">{result.result?.definition}</div>
                   {result.was_discovered && (
                     <div className="result-badge">NEW DISCOVERY!</div>
                   )}

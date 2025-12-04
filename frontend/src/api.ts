@@ -2,13 +2,15 @@
  * API service for communicating with the FastAPI backend
  */
 
+import type { Element, Stats, CombineResponse } from './types';
+
 const API_BASE_URL = 'http://localhost:8000';
 
 export const api = {
   /**
    * Get all discovered elements
    */
-  async getElements() {
+  async getElements(): Promise<Element[]> {
     const response = await fetch(`${API_BASE_URL}/elements`);
     if (!response.ok) throw new Error('Failed to fetch elements');
     return response.json();
@@ -17,7 +19,7 @@ export const api = {
   /**
    * Combine two elements
    */
-  async combineElements(element1Id, element2Id) {
+  async combineElements(element1Id: number, element2Id: number): Promise<CombineResponse> {
     const response = await fetch(`${API_BASE_URL}/combine`, {
       method: 'POST',
       headers: {
@@ -35,7 +37,7 @@ export const api = {
   /**
    * Get game statistics
    */
-  async getStats() {
+  async getStats(): Promise<Stats> {
     const response = await fetch(`${API_BASE_URL}/stats`);
     if (!response.ok) throw new Error('Failed to fetch stats');
     return response.json();
