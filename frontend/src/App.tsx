@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { api } from './api';
 import type { Element, Stats, CombineResponse } from './types';
+import { Grimoire } from './Grimoire';
 
 function App() {
   const [elements, setElements] = useState<Element[]>([]);
@@ -11,6 +12,7 @@ function App() {
   const [result, setResult] = useState<CombineResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showGrimoire, setShowGrimoire] = useState(false);
 
   // Load elements and stats on mount
   useEffect(() => {
@@ -100,7 +102,16 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Semantic Alchemy Lab</h1>
+        <div className="header-top">
+          <h1>Semantic Alchemy Lab</h1>
+          <button
+            className="grimoire-button"
+            onClick={() => setShowGrimoire(true)}
+            title="Open Grimoire"
+          >
+            📖 Grimoire
+          </button>
+        </div>
         {stats && (
           <div className="stats">
             <div className="stat-item">
@@ -230,6 +241,14 @@ function App() {
           )}
         </div>
       </div>
+
+      {/* Grimoire Modal */}
+      {showGrimoire && (
+        <Grimoire
+          elements={elements}
+          onClose={() => setShowGrimoire(false)}
+        />
+      )}
     </div>
   );
 }

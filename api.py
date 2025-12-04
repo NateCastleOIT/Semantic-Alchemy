@@ -49,6 +49,12 @@ class ElementResponse(BaseModel):
     emoji: str  # Maps to visual_hint
     definition: str  # Maps to description
     is_base: bool
+    tags: List[str] = []
+    behavior_hints: List[str] = []
+    parent_a_id: Optional[str] = None
+    parent_b_id: Optional[str] = None
+    parent_a_name: Optional[str] = None
+    parent_b_name: Optional[str] = None
 
 
 class CombineResponse(BaseModel):
@@ -72,16 +78,34 @@ async def root():
 async def get_all_elements():
     """Get all discovered elements."""
     elements = database.get_all_elements()
-    return [
-        ElementResponse(
+    result = []
+
+    for elem in elements:
+        # Get parent names if element is derived
+        parent_a_name = None
+        parent_b_name = None
+        if elem.parent_a:
+            parent_a = database.get_element(elem.parent_a)
+            parent_a_name = parent_a.name if parent_a else None
+        if elem.parent_b:
+            parent_b = database.get_element(elem.parent_b)
+            parent_b_name = parent_b.name if parent_b else None
+
+        result.append(ElementResponse(
             id=elem.id,
             name=elem.name,
             emoji=elem.visual_hint,
             definition=elem.description,
-            is_base=elem.is_base
-        )
-        for elem in elements
-    ]
+            is_base=elem.is_base,
+            tags=elem.tags,
+            behavior_hints=elem.behavior_hints,
+            parent_a_id=elem.parent_a,
+            parent_b_id=elem.parent_b,
+            parent_a_name=parent_a_name,
+            parent_b_name=parent_b_name
+        ))
+
+    return result
 
 
 @app.get("/elements/{element_id}", response_model=ElementResponse)
@@ -91,12 +115,28 @@ async def get_element(element_id: str):
     if not element:
         raise HTTPException(status_code=404, detail="Element not found")
 
+    # Get parent names if element is derived
+    parent_a_name = None
+    parent_b_name = None
+    if element.parent_a:
+        parent_a = database.get_element(element.parent_a)
+        parent_a_name = parent_a.name if parent_a else None
+    if element.parent_b:
+        parent_b = database.get_element(element.parent_b)
+        parent_b_name = parent_b.name if parent_b else None
+
     return ElementResponse(
         id=element.id,
         name=element.name,
         emoji=element.visual_hint,
         definition=element.description,
-        is_base=element.is_base
+        is_base=element.is_base,
+        tags=element.tags,
+        behavior_hints=element.behavior_hints,
+        parent_a_id=element.parent_a,
+        parent_b_id=element.parent_b,
+        parent_a_name=parent_a_name,
+        parent_b_name=parent_b_name
     )
 
 
@@ -117,6 +157,10 @@ async def combine_elements(request: CombineRequest):
         # Check if this was a new discovery
         was_discovered = not database.get_combination(f"{elem1.id}+{elem2.id}")
 
+        # Get parent names for result
+        parent_a_name = elem1.name
+        parent_b_name = elem2.name
+
         return CombineResponse(
             success=True,
             result=ElementResponse(
@@ -124,7 +168,13 @@ async def combine_elements(request: CombineRequest):
                 name=result.name,
                 emoji=result.visual_hint,
                 definition=result.description,
-                is_base=result.is_base
+                is_base=result.is_base,
+                tags=result.tags,
+                behavior_hints=result.behavior_hints,
+                parent_a_id=result.parent_a,
+                parent_b_id=result.parent_b,
+                parent_a_name=parent_a_name,
+                parent_b_name=parent_b_name
             ),
             message=f"Created: {result.name}",
             was_discovered=was_discovered

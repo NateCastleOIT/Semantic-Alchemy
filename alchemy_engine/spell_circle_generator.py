@@ -704,14 +704,6 @@ class SpellCircleGenerator:
             path += "Z"
             center_parts.append(f'<path d="{path}" fill="{color}" opacity="0.8"/>')
 
-        # Add element initial in center
-        initial = name[0].upper() if name else "?"
-        center_parts.append(
-            f'<text x="{self.center}" y="{self.center}" font-family="serif" '
-            f'font-size="16" font-weight="bold" fill="white" opacity="0.9" '
-            f'text-anchor="middle" dominant-baseline="middle">{initial}</text>'
-        )
-
         return "\n  ".join(center_parts)
 
     def _get_rotation(self, seed: int, archetype: str) -> float:
