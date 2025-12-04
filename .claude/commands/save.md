@@ -17,17 +17,16 @@ You are helping create a git commit with guardrails and best practices.
 
 3. Show the user what will be committed:
    - Run `git diff --stat` to show file summary
-   - Run `git diff` to show detailed changes (if reasonable size)
-   - List any untracked files
+   - Briefly summarize the key changes
 
-## Commit Message Template
+## Generate Commit Message
 
-4. Ask the user for commit details and suggest following this format:
+4. Automatically analyze the changes and create a comprehensive commit message following this format:
 
 ```
 <type>: <short summary>
 
-<optional detailed description>
+<detailed description>
 
 <optional footer with references>
 ```
@@ -40,24 +39,18 @@ You are helping create a git commit with guardrails and best practices.
 - `refactor: simplify discovery logic`
 - `docs: update API documentation`
 
-5. After gathering information, create a well-formatted commit message
-
 ## Create Commit
 
-6. Stage and commit the changes:
-   - Add files as appropriate (ask if there are many untracked files)
-   - Create the commit with the formatted message
+5. Stage and commit the changes:
+   - Add all relevant files automatically
+   - Create the commit with the generated message
    - Show the commit hash and summary
-
-## Push Option
-
-7. Ask the user: "Would you like to push these changes to remote?"
-   - If yes, run `git push` (or `git push -u origin <branch>` if needed)
-   - If no, remind them they can push later with `git push`
+   - Show the generated commit message for user's reference
 
 ## Additional Guidelines
 
 - Be concise but thorough
-- If the user wants to commit specific files only, respect that
+- Generate comprehensive commit messages that accurately describe all changes
 - Never force push without explicit user request
 - If pre-commit hooks fail, show the errors and ask how to proceed
+- User will manually push when ready, so don't ask about pushing
