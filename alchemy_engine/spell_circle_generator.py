@@ -215,7 +215,7 @@ class SpellCircleGenerator:
             color = colors[i % len(colors)]
             patterns.append(
                 f'<path d="{path}" fill="none" stroke="{color}" '
-                f'stroke-width="2" opacity="0.5"/>'
+                f'stroke-width="2" opacity="0.65"/>'
             )
 
         return patterns
@@ -245,7 +245,7 @@ class SpellCircleGenerator:
             x, y = hex_points[i]
             patterns.append(
                 f'<line x1="{self.center}" y1="{self.center}" x2="{x}" y2="{y}" '
-                f'stroke="{colors[1 % len(colors)]}" stroke-width="1" opacity="0.5"/>'
+                f'stroke="{colors[1 % len(colors)]}" stroke-width="1" opacity="0.6"/>'
             )
 
         # Smaller inner hexagon
@@ -419,33 +419,100 @@ class SpellCircleGenerator:
 
                     patterns.append(
                         f'<line x1="{prev_x}" y1="{prev_y}" x2="{x}" y2="{y}" '
-                        f'stroke="{colors[1 % len(colors)]}" stroke-width="1" opacity="0.4"/>'
+                        f'stroke="{colors[1 % len(colors)]}" stroke-width="1" opacity="0.55"/>'
                     )
 
         return patterns
 
     def _pattern_neutral(self, colors: List[str], seed: int) -> List[str]:
-        """Balanced geometric pattern for neutral elements."""
+        """Varied geometric patterns for neutral/hybrid elements."""
         patterns = []
 
-        # Create balanced star pattern
-        points = 5
-        outer_r = self.center * 0.75
-        inner_r = self.center * 0.35
+        # Choose from several different patterns based on seed
+        pattern_type = seed % 5
 
-        path = "M "
-        for i in range(points * 2):
-            angle = math.radians(i * 180 / points - 90)
-            r = outer_r if i % 2 == 0 else inner_r
-            x = self.center + r * math.cos(angle)
-            y = self.center + r * math.sin(angle)
-            path += f"{x} {y} L "
-        path += "Z"
-
-        patterns.append(
-            f'<path d="{path}" fill="none" stroke="{colors[0]}" '
-            f'stroke-width="2" opacity="0.6"/>'
-        )
+        if pattern_type == 0:
+            # Interlocking triangles
+            size = self.center * 0.6
+            patterns.append(
+                f'<path d="M {self.center} {self.center - size} '
+                f'L {self.center - size} {self.center + size} '
+                f'L {self.center + size} {self.center + size} Z" '
+                f'fill="none" stroke="{colors[0]}" stroke-width="2" opacity="0.6"/>'
+            )
+            patterns.append(
+                f'<path d="M {self.center} {self.center + size * 0.6} '
+                f'L {self.center - size * 0.6} {self.center - size * 0.6} '
+                f'L {self.center + size * 0.6} {self.center - size * 0.6} Z" '
+                f'fill="none" stroke="{colors[1 % len(colors)]}" stroke-width="2" opacity="0.6"/>'
+            )
+        elif pattern_type == 1:
+            # Concentric squares rotated
+            for i in range(3):
+                size = self.center * (0.3 + i * 0.15)
+                rotation = 45 if i % 2 else 0
+                patterns.append(
+                    f'<rect x="{self.center - size}" y="{self.center - size}" '
+                    f'width="{size * 2}" height="{size * 2}" fill="none" '
+                    f'stroke="{colors[i % len(colors)]}" stroke-width="1.5" opacity="0.5" '
+                    f'transform="rotate({rotation} {self.center} {self.center})"/>'
+                )
+        elif pattern_type == 2:
+            # Cross pattern with diamonds
+            length = self.center * 0.7
+            patterns.append(
+                f'<line x1="{self.center}" y1="{self.center - length}" '
+                f'x2="{self.center}" y2="{self.center + length}" '
+                f'stroke="{colors[0]}" stroke-width="2" opacity="0.6"/>'
+            )
+            patterns.append(
+                f'<line x1="{self.center - length}" y1="{self.center}" '
+                f'x2="{self.center + length}" y2="{self.center}" '
+                f'stroke="{colors[1 % len(colors)]}" stroke-width="2" opacity="0.6"/>'
+            )
+            # Diamonds at ends
+            diamond_size = 8
+            for angle in [0, 90, 180, 270]:
+                angle_rad = math.radians(angle)
+                x = self.center + length * math.cos(angle_rad)
+                y = self.center + length * math.sin(angle_rad)
+                patterns.append(
+                    f'<rect x="{x - diamond_size}" y="{y - diamond_size}" '
+                    f'width="{diamond_size * 2}" height="{diamond_size * 2}" fill="{colors[0]}" '
+                    f'opacity="0.5" transform="rotate(45 {x} {y})"/>'
+                )
+        elif pattern_type == 3:
+            # Octagon with radial divisions
+            sides = 8
+            radius = self.center * 0.7
+            oct_path = "M "
+            for i in range(sides):
+                angle = math.radians((360 / sides) * i)
+                x = self.center + radius * math.cos(angle)
+                y = self.center + radius * math.sin(angle)
+                oct_path += f"{x} {y} L "
+                # Radial lines
+                patterns.append(
+                    f'<line x1="{self.center}" y1="{self.center}" x2="{x}" y2="{y}" '
+                    f'stroke="{colors[1 % len(colors)]}" stroke-width="1" opacity="0.55"/>'
+                )
+            oct_path += "Z"
+            patterns.append(
+                f'<path d="{oct_path}" fill="none" stroke="{colors[0]}" '
+                f'stroke-width="2" opacity="0.6"/>'
+            )
+        else:
+            # Vesica piscis (two overlapping circles)
+            offset = self.center * 0.25
+            radius = self.center * 0.6
+            patterns.append(
+                f'<circle cx="{self.center - offset}" cy="{self.center}" r="{radius}" '
+                f'fill="none" stroke="{colors[0]}" stroke-width="2" opacity="0.5"/>'
+            )
+            patterns.append(
+                f'<circle cx="{self.center + offset}" cy="{self.center}" r="{radius}" '
+                f'fill="none" stroke="{colors[1 % len(colors)]}" stroke-width="2" opacity="0.5"/>'
+            )
 
         return patterns
 
@@ -481,17 +548,21 @@ class SpellCircleGenerator:
         return runes
 
     def _generate_constellation(self, behavior_hints: List[str], colors: List[str], seed: int) -> List[str]:
-        """Create constellation by connecting behavior symbols."""
+        """Create subtle constellation by connecting behavior symbols."""
         constellation = []
-        symbol_count = min(len(behavior_hints), 8)
+        symbol_count = min(len(behavior_hints), 6)  # Reduced from 8
 
-        if symbol_count < 2:
+        if symbol_count < 3:  # Require at least 3 for variety
+            return constellation
+
+        # Only add constellation 50% of the time based on seed
+        if seed % 2 == 0:
             return constellation
 
         symbol_radius = self.center * 0.55
         points = []
 
-        # Place symbols
+        # Place symbols (smaller and more subtle)
         for i in range(symbol_count):
             angle = (360 / symbol_count) * i + (seed % 45)
             angle_rad = math.radians(angle)
@@ -499,23 +570,25 @@ class SpellCircleGenerator:
             y = self.center + symbol_radius * math.sin(angle_rad)
             points.append((x, y))
 
-            # Small symbol marker
+            # Smaller, more subtle markers
             color = colors[i % len(colors)]
             constellation.append(
-                f'<circle cx="{x}" cy="{y}" r="4" fill="{color}" opacity="0.8"/>'
+                f'<circle cx="{x}" cy="{y}" r="2.5" fill="{color}" opacity="0.7"/>'
             )
 
-        # Connect symbols with constellation lines
+        # Only connect to adjacent points (not full polygon)
+        # Create more varied connection patterns
         for i in range(len(points)):
-            next_i = (i + 1) % len(points)
-            x1, y1 = points[i]
-            x2, y2 = points[next_i]
+            # Connect to next point only if it's not creating a regular polygon feel
+            if i < len(points) - 1 and seed % 3 != 0:  # Skip some connections
+                x1, y1 = points[i]
+                x2, y2 = points[i + 1]
 
-            constellation.append(
-                f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" '
-                f'stroke="{colors[0]}" stroke-width="1" opacity="0.3" '
-                f'stroke-dasharray="3 2"/>'
-            )
+                constellation.append(
+                    f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" '
+                    f'stroke="{colors[0]}" stroke-width="0.8" opacity="0.45" '
+                    f'stroke-dasharray="2 3"/>'
+                )
 
         return constellation
 
