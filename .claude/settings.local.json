@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(if [ -d \"frontend/node_modules\" ])",
+      "Bash(then echo \"frontend/node_modules exists\")",
+      "Bash(fi)",
+      "Bash(if [ -d \"frontend/dist\" ])",
+      "Bash(then echo \"frontend/dist exists\")",
+      "Bash(if [ -d \"frontend/.vite\" ])",
+      "Bash(then echo \"frontend/.vite exists\")",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nchore: add Claude Code custom commands and update permissions\n\nAdded custom slash commands for common development workflows:\n- /clean: Clean build artifacts\n- /save: Smart commit with guardrails\n- /test: Run test suite\n- /review: Code review\n- /pr: Create pull request\n- /sync: Sync with remote\n\nUpdated .claude/settings.local.json with bash permissions for\ndirectory checking and find operations.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
