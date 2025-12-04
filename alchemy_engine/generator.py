@@ -5,6 +5,7 @@ import json
 import requests
 from typing import Optional
 from .models import Element
+from .spell_circle_generator import SpellCircleGenerator
 from .config import (
     OLLAMA_BASE_URL,
     OLLAMA_MODEL,
@@ -31,6 +32,7 @@ class ElementGenerator:
         self.base_url = base_url
         self.model = model
         self.generate_url = f"{base_url}/api/generate"
+        self.spell_circle_gen = SpellCircleGenerator()
 
     def test_connection(self) -> bool:
         """Test if Ollama is running and accessible."""
@@ -82,13 +84,21 @@ class ElementGenerator:
                     name=element_data["name"],
                     description=element_data["description"],
                     tags=element_data["tags"],
-                    visual_hint=element_data["visual_hint"],
+                    visual_hint="",  # Will be generated as spell circle
                     behavior_hints=element_data["behavior_hints"],
                     is_base=False,
                     parent_a=element_a.id,
                     parent_b=element_b.id,
                     combination_order=f"{element_a.id}+{element_b.id}"
                 )
+
+                # Generate unique spell circle incorporating parent patterns
+                spell_circle_svg = self.spell_circle_gen.generate(
+                    new_element,
+                    parent_a=element_a,
+                    parent_b=element_b
+                )
+                new_element.visual_hint = spell_circle_svg
 
                 return new_element
 

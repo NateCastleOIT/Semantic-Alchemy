@@ -130,7 +130,10 @@ function App() {
                 onClick={() => handleElementClick(element)}
                 title={element.definition}
               >
-                <span className="element-emoji">{element.emoji}</span>
+                <div
+                  className="element-icon"
+                  dangerouslySetInnerHTML={{ __html: element.emoji }}
+                />
                 <div className="element-name">{element.name}</div>
               </div>
             ))}
@@ -147,7 +150,10 @@ function App() {
             >
               {slot1 ? (
                 <>
-                  <span className="slot-emoji">{slot1.emoji}</span>
+                  <div
+                    className="slot-icon"
+                    dangerouslySetInnerHTML={{ __html: slot1.emoji }}
+                  />
                   <div className="slot-name">{slot1.name}</div>
                 </>
               ) : (
@@ -164,7 +170,10 @@ function App() {
             >
               {slot2 ? (
                 <>
-                  <span className="slot-emoji">{slot2.emoji}</span>
+                  <div
+                    className="slot-icon"
+                    dangerouslySetInnerHTML={{ __html: slot2.emoji }}
+                  />
                   <div className="slot-name">{slot2.name}</div>
                 </>
               ) : (
@@ -197,7 +206,10 @@ function App() {
             <div className={`result-area ${result.success ? 'success' : 'failure'}`}>
               {result.success ? (
                 <>
-                  <div className="result-emoji">{result.result?.emoji}</div>
+                  <div
+                    className="result-icon"
+                    dangerouslySetInnerHTML={{ __html: result.result?.emoji || '' }}
+                  />
                   <div className="result-name">{result.result?.name}</div>
                   <div className="result-definition">{result.result?.definition}</div>
                   {result.was_discovered && (

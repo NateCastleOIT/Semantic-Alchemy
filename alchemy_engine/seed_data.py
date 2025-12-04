@@ -2,6 +2,7 @@
 Seed data: Base elements for the alchemy system.
 """
 from .models import Element
+from .spell_circle_generator import SpellCircleGenerator
 
 
 def get_base_elements() -> list[Element]:
@@ -11,7 +12,10 @@ def get_base_elements() -> list[Element]:
     These are carefully crafted to have rich, diverse properties that
     can combine in interesting ways.
     """
-    return [
+    generator = SpellCircleGenerator()
+
+    # Create base elements first (without spell circles)
+    base_elements = [
         Element(
             name="Fire",
             description="The primal force of heat and transformation. Fire consumes and purifies, turning matter into energy and ash. It represents passion, destruction, and rebirth.",
@@ -79,11 +83,18 @@ def get_base_elements() -> list[Element]:
             name="Order",
             description="The structure that emerges from chaos. Order creates patterns, establishes laws, and brings harmony through constraint. It represents control, predictability, and perfection.",
             tags=["structured", "lawful", "harmonious", "controlled", "perfect"],
-            visual_hint="⚖️",
+            visual_hint="⚖️",  # Temporary, will be replaced with spell circle
             behavior_hints=["structures", "constrains", "harmonizes", "calculates", "perfects"],
             is_base=True
         ),
     ]
+
+    # Generate unique spell circles for each base element
+    for element in base_elements:
+        spell_circle_svg = generator.generate(element)
+        element.visual_hint = spell_circle_svg
+
+    return base_elements
 
 
 def initialize_base_elements(database):
